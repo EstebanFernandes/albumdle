@@ -2,6 +2,7 @@
 // Global variable to store the parsed CSV data
 let albumData = [];
 let attempts = [];
+let currentTranslations = {};
 let attemptNumber = 1;
 const maxAttempts = 6;
 const attemptsBeforeCover = 3;
@@ -101,6 +102,9 @@ function createAlbumAttempt(data, todayAlbum) {
   //If there is a difference consider as close or high, we apply a different color
   const rankDifference = todayAlbum ? Math.abs(todayAlbum.rank_2020 - data.rank_2020) : null;
 
+  if(rankDifference !== null && rankDifference === 0 )
+    clone.querySelector('.rankIcon').parentElement.classList.add('correct');
+  else
   if (rankDifference !== null && rankDifference <= 20)
     clone.querySelector('.rankIcon').parentElement.classList.add('close');
   else
@@ -109,7 +113,9 @@ function createAlbumAttempt(data, todayAlbum) {
   clone.querySelector('.releaseDateIcon').textContent = data.release_year || 'Unknown Release Date';
   const dateDifference = todayAlbum ? Math.abs(todayAlbum.release_year - data.release_year) : null;
 
-  if (dateDifference !== null && dateDifference <= 10)
+  if (dateDifference !== null && dateDifference === 0)
+    clone.querySelector('.releaseDateIcon').parentElement.classList.add('correct');
+  else if (dateDifference !== null && dateDifference <= 10)
     clone.querySelector('.releaseDateIcon').parentElement.classList.add('close');
   else
     clone.querySelector('.releaseDateIcon').parentElement.classList.add('incorrect');
@@ -133,7 +139,7 @@ function createAlbumAttempt(data, todayAlbum) {
     clone.querySelector('.groupMemberIcon').parentElement.classList.add('incorrect');
   let memberCount = (Number(data.artist_member_count) === 1) ? 'Solo' :
     (Number(data.artist_member_count) === 2) ? 'Duo' :
-      (`Group (${data.artist_member_count})` || 'Unknown Group Members');
+      (`${capitalize(t("group"))} (${data.artist_member_count})` || 'Unknown Group Members');
   clone.querySelector('.groupMemberIcon').textContent = memberCount;
   if (data.country.length === 2)
     clone.querySelector('.locationIcon').textContent = (data.country != '') ? getFlagEmoji(data.country) : 'Unknown Location';
@@ -144,6 +150,7 @@ function createAlbumAttempt(data, todayAlbum) {
 
 // Run on load
 window.addEventListener('DOMContentLoaded', async () => {
+  initLanguage();
   await loadAlbumCSV();
   const todayAlbum = getAlbumOfTheDay();
   console.log("Album of the Day:", todayAlbum);
@@ -235,28 +242,35 @@ document.getElementById('guessButton').addEventListener('click', () => {
 function evaluateAttempt(attempt) {
   const todayAlbum = getAlbumOfTheDay();
   // Get today's album
-  if (todayAlbum === attempt) {
-    document.getElementById(String(attempts.length) + '-attempt').classList.add('correct');
-    revealAnswer(todayAlbum);
-    return;
-  }
-  document.getElementById('attemptsList').prepend(createAlbumAttempt(attempt,todayAlbum));
+  document.getElementById('attemptsList').prepend(createAlbumAttempt(attempt, todayAlbum));
   document.getElementById('attemptsContainer').scrollTo({ top: 0, behavior: 'smooth' });
   attempts.push(attempt);
   attemptNumber++;
   updateHints();
 
+  if (todayAlbum === attempt) {
+    document.getElementById(String(attempts.length) + '-attempt').classList.add('correct');
+    revealAnswer(todayAlbum);
+    return;
+  }
   if (attempts.length === maxAttempts) {
     revealAnswer(todayAlbum, false);
     return;
   }
 
   // If not correct, add 'incorrect' class to the attempt and update stats
+  document.getElementById(String(attempts.length) + '-attempt').classList.add('incorrect');
+  updateAlbumInformation(todayAlbum, attempt);
+
+
+}
+
+function updateAlbumInformation(todayAlbum, attempt) {
 
   //ARTIST NAME LOGIC
   if (todayAlbum.clean_name && attempt.clean_name && todayAlbum.clean_name.toLowerCase() === attempt.clean_name.toLowerCase())
     artistName.textContent = todayAlbum.clean_name;
-  document.getElementById(String(attempts.length) + '-attempt').classList.add('incorrect');
+
   // RANK LOGIC
   const ranks = attempts.map(a => Number(a.rank_2020)).filter(n => !isNaN(n));
   let rankText = numericLogic(ranks, todayAlbum.rank_2020, fullDisplayRank.id, true);
@@ -304,21 +318,34 @@ function evaluateAttempt(attempt) {
   if (findLabel) {
     labelInfo.textContent = todayAlbum.label_name;
   }
+}
+function revealEverything() {
+  const todayAlbum = getAlbumOfTheDay();
+  if (!todayAlbum) return;
 
-
+  updateAlbumInformation(todayAlbum, todayAlbum);
+  revealHint('cover');
+  revealHint('tracks');
+  document.getElementById(`albumHintCover`).style.filter = 'none';
+  document.getElementById(`albumHintCover`).style.transform = 'none';
+  const title = todayAlbum.album || 'Unknown Album';
+  document.getElementById('albumTitle').innerHTML = title;
 }
 
 
 function updateHints() {
   const attemptsLeft = maxAttempts - attemptsBeforeCover - attempts.length;
   attemptsLeftBeforeReveal.textContent = attemptsLeft;
-  if (attemptsLeft == 0)
+  if (attemptsLeft == 0) {
     document.getElementById("revealHintLeftButton").disabled = false;
+    document.getElementById("attemptsLeftBeforeReveal").innerHTML = t("hint-available");
+  }
   const attemptsRight = maxAttempts - attemptsBeforeTracks - attempts.length;
   attemptsRightBeforeReveal.textContent = attemptsRight;
-  if (attemptsRight == 0)
+  if (attemptsRight == 0) {
     document.getElementById("revealHintRightButton").disabled = false;
-
+    document.getElementById("attemptsRightBeforeReveal").innerHTML = t("hint-available");
+  }
 }
 
 function revealHint(hintType) {
@@ -341,7 +368,7 @@ function revealHint(hintType) {
 
 
 
-function numericLogic(values, aimValue, idElement, isReverse = false) {
+function numericLogic(values, aimValue, isReverse = false) {
   if (!Array.isArray(values) || values.length === 0) {
     return 'Unknown';
   }
@@ -351,11 +378,11 @@ function numericLogic(values, aimValue, idElement, isReverse = false) {
     return 'Unknown';
   }
   if (values.includes(aimValue)) {
-    document.getElementById(idElement).classList.add('correct');
+
     return String(aimValue);
   }
 
-  document.getElementById(idElement).classList.add('soso');
+
   if (values.length === 1) {
     if (!isReverse)
       return (values[0] > aimValue) ? `${values[0]} ↓` : `${values[0]} ↑`;
@@ -461,7 +488,7 @@ function memberLogic(members, aimMember) {
       };
     else
       return {
-        display: "Group (" + aimMember + ")",
+        display: `${capitalize(t("group"))} (${aimMember})`,
         color: getInterpolatedColor(1)
       };
   }
@@ -474,7 +501,7 @@ function memberLogic(members, aimMember) {
     else {
       if (members.find(member => Number(member) > 1.0) !== undefined)
         return {
-          display: "Group (?)",
+          display: `${capitalize(t("group"))} (?)`,
           color: getInterpolatedColor(0.5)
         };
     }
@@ -528,23 +555,28 @@ function getInterpolatedColor(ratio) {
 }
 
 
-
-
-function revealAnswer(album, hasWin = true) {
-  if (hasWin)
-    document.getElementById('revealMessage').textContent = "Congratulations! You guessed it right!";
-  else
-    document.getElementById('revealMessage').textContent = "Loser !🫵🫵";
-  const revealAlbum = createAlbumAttempt(album);
-  document.getElementById("revealAlbumContainer").appendChild(revealAlbum);
-
-  if (album.spotify_url && album.spotify_url.includes(':')) {
-    const id = album.spotify_url.split(":").pop();
-    document.getElementById('revealSpotify').href = `https://open.spotify.com/album/${id}`;
+async function revealAnswer(album, hasWin = true) {
+  if (hasWin) {
+    document.getElementById('revealMessage').textContent = t("reveal.win");
+    document.getElementById("subtitle").textContent = `${t("reveal.subtitle")} ${attempts.length} / ${maxAttempts} ${t("attempts")}!`;
+    launchTopConfettiBurst()
+  } else {
+    document.getElementById('revealMessage').textContent = t("reveal.lose");
   }
+  updateAlbumInformation(album, album);
+  document.getElementById('guessContainer').style.display = "none";
+  document.getElementById('revealAnswer').style.display = "flex";
 
-  document.getElementById('revealSection').style.display = "flex"
-  document.getElementById('gameSection').style.display = "none"
+  revealEverything();
+  /*
+    if (album.spotify_url && album.spotify_url.includes(':')) {
+      const id = album.spotify_url.split(":").pop();
+      document.getElementById('revealSpotify').href = `https://open.spotify.com/album/${id}`;
+    }
+  
+    document.getElementById('revealSection').style.display = "flex"
+    document.getElementById('gameSection').style.display = "none"
+    */
 }
 
 
@@ -603,7 +635,7 @@ async function loadCarouselTrack(track, data, start, end) {
 
 
 function createImageElement(item) {
-  const { small_thumbnails, album_id, album, clean_name, release_year } = item;
+  const { small_thumbnails,  album, clean_name, release_year } = item;
 
   const template = document.getElementById('carouselImageTemplate');
   const clone = template.content.cloneNode(true);
@@ -613,16 +645,19 @@ function createImageElement(item) {
   //img.title = album || "Album cover";
   img.style.objectFit = "cover";
   img.style.borderRadius = "10px";
-  const text = `<b>${album}<em> ${clean_name} </em>(${release_year})</b>` ;
+  // 🔥 Random square size using vh (e.g., 15vh to 20vh)
+  let size = 15 + Math.random() * 5; // Between 15vh–20vh
+  img.style.width = `${size}vh`;
+  img.style.height = `${size}vh`;
+
+  size = size + 2
+  const text = `<b>${album}<em> ${clean_name} </em>(${release_year})</b>`;
+  clone.querySelector('.tooltip-text').style.width = `${size}vh`;
   clone.querySelector('.tooltip-text').style.bottom = "80%";
   clone.querySelector('.tooltip-text').style.left = "50%";
   clone.querySelector('.tooltip-text').style.transform = "translateY(50%)";
   clone.querySelector('.tooltip-text').style.transform = "translateX(-50%)";
   clone.querySelector('.tooltip-text').innerHTML = text;
-  // 🔥 Random square size using vh (e.g., 15vh to 20vh)
-  const size = 15 + Math.random() * 5; // Between 15vh–20vh
-  img.style.width = `${size}vh`;
-  img.style.height = `${size}vh`;
   return clone;
 }
 
@@ -637,4 +672,122 @@ function applyRandomScrollSpeed(track, isReverse = false) {
 // #endregion
 function getFlagEmoji(countryCode) {
   return regionNames.of(countryCode);
+}
+
+
+function launchConfetti(x, y) {
+  const colors = ['#f94144', '#f3722c', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
+  const count = 80;
+
+  for (let i = 0; i < count; i++) {
+    const confetti = document.createElement('div');
+    confetti.classList.add('confetti-piece');
+
+    confetti.style.left = `${x}px`;
+    confetti.style.top = `${y}px`;
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDuration = `${1 + Math.random() * 0.8}s`;
+
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = Math.random() * 150 + 50;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance;
+
+    confetti.style.setProperty('--dx', `${dx}px`);
+    confetti.style.setProperty('--dy', `${dy}px`);
+    confetti.style.setProperty('--rz', `${Math.random() * 360}deg`);
+
+    document.body.appendChild(confetti);
+
+    setTimeout(() => confetti.remove(), 2000);
+  }
+}
+
+async function launchTopConfettiBurst() {
+  const launches = 25;
+
+  for (let i = 0; i < launches; i++) {
+    const delay = Math.random() * (100 - 50) + 50; // 50ms–100ms
+    setTimeout(() => {
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * (window.innerHeight * 0.3); // top 30%
+      launchConfetti(x, y);
+    }, i * delay);
+  }
+}
+
+
+/*#region LANGUAGE LOGIC */
+function initLanguage() {
+  // Detect browser language
+  const browserLang = navigator.language || navigator.userLanguage; // e.g. "en-US", "fr-FR"
+  const shortLang = browserLang.split('-')[0]; // "en" or "fr"
+
+  // Supported languages
+  const supportedLangs = ['en', 'fr'];
+
+  // Check if saved lang exists in localStorage
+  let lang = localStorage.getItem("lang");
+
+  if (!lang) {
+    // If no saved language, use browser lang if supported, else default to 'en'
+    lang = supportedLangs.includes(shortLang) ? shortLang : 'en';
+  }
+
+  //languageSelect.value = lang;
+  loadLanguage(lang);
+  /*
+    languageSelect.addEventListener("change", (e) => {
+      const newLang = e.target.value;
+      localStorage.setItem("lang", newLang);
+      loadLanguage(newLang);
+    });
+  */
+}
+function loadLanguage(lang) {
+  fetch(`lang/${lang}.json`)
+    .then((response) => response.json())
+    .then((translations) => {
+      currentTranslations = translations; // Save globally
+      applyTranslations(translations);
+    })
+    .catch((err) => console.error("Failed to load language file:", err));
+}
+
+
+function applyTranslations(translations) {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    const translation = getNestedTranslation(translations, key);
+
+    if (translation) {
+      // Support for tooltips (title), placeholders, textContent
+      if (el.hasAttribute("placeholder")) {
+        el.setAttribute("placeholder", translation);
+      }
+       else if (el.hasAttribute("title")) {
+        el.setAttribute("title", translation);
+      }
+
+      if (el.placeholder !== undefined) {
+        el.placeholder = translation;
+      } else if (el.value !== undefined && el.tagName === "INPUT") {
+        el.value = translation;
+      } else {
+        el.textContent = translation;
+      }
+    }
+  });
+}
+
+function getNestedTranslation(obj, key) {
+  return key.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), obj);
+}
+
+function t(key) {
+  return key.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : key), currentTranslations);
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }

@@ -1,0 +1,37 @@
+{
+    "page-title": "Albumdle",
+    "tooltip-header": "Albumdle est votre jeu pour tester vos connaissances musicales ! Essayez de deviner l'album du jour parmi les 500 plus grands albums de tous les temps selon Rolling Stone.",
+    "subtitle": "Pour jouer, entrez simplement le nom de l'album dans le champ ci-dessous et cliquez sur \"Deviner\".",
+    "guess": "Cliquez pour soumettre votre proposition",
+    "hint-cover": "Indice sur la pochette",
+    "hint-tracks": "Chansons populaires de l'album",
+    "hint-available": "Disponible maintenant !",
+    "attempts-available": "Disponible dans",
+    "attempts" : "essais",
+    "group": "groupe",
+    "reveal-button": "Révéler",
+    "input-placeholder": "Entrez le nom d'un album ou d'un artiste",
+    "guess-button": "Deviner",
+    "unknown-album": "???",
+    "attemptsList" : "Liste des essais",
+    "tooltips": {
+        "rank": "Classement de l'album dans les 500 plus grands albums de Rolling Stone.",
+        "release-date": "Date de sortie de l'album.",
+        "genre": "Genre(s) de l'album.",
+        "album-type": "Type d'album : Studio, Compilation, Live, etc...",
+        "group-members": "Membres du groupe.",
+        "location": "Lieu d'origine.",
+        "label": "Label qui produit l'album."
+    },
+    "footer": {
+        "more-info": "Pour plus d'informations, visitez",
+        "rolling-stone-link": "Les 500 plus grands albums de tous les temps selon Rolling Stone",
+        "made-by": "Fait avec ❤️ par",
+        "creator-name": "Esteban Fernandes"
+    },
+    "reveal":{
+        "subtitle" : "Album du jour trouvé en ",
+        "win": "Félicitations ! Vous avez deviné correctement !",
+        "lose": "Gros nul !🫵🫵"
+    }
+}
