@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Albumdle</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- Carousel Section -->
+  <div class="carousel-wrapper">
+    <div class="left">
+	<!-- Top carousel -->
+	<div class="carousel">
+		<div class="carousel-track">
+			<!-- Populated dynamically -->
+		</div>
+	</div>
+
+
+	<!-- Middle carousel -->
+	<div class="carousel reverse">
+		<div class="carousel-track">
+			<!-- Populated dynamically -->
+		</div>
+	</div>
+</div>
+<div class="right">
+	<!-- Bottom carousel -->
+	<div class="carousel reverse">
+		<div class="carousel-track">
+			<!-- Populated dynamically -->
+		</div>
+	</div>
+
+<!-- Bottom carousel -->
+	<div class="carousel ">
+		<div class="carousel-track">
+			<!-- Populated dynamically -->
+		</div>
+	</div>
+</div>
+
+
+
+</div>
+<!--
+<div id="backFilter"></div>-->
+
+<header class="header">
+<img src="assets/album.png" id="headerLogo"/>
+  <h1> Albumdle </h1>
+  <div class="tooltip tooltip-bottom">
+    <img src="assets/interrogation.svg" id="questionMark">
+    <span class="tooltip-text">Albumdle is your game to test your music knowledge!
+      Try to guess the album of the day based on Rolling Stone's Greatest 500 albums of all time.
+    </span>
+  </div>
+</header>
+				<div class="bodyclass" id="gameSection">
+					 <h3> To play, simply enter the name of the album in the input field below and click "Guess".</h3>
+            <div class="squareHolder">
+            <div class="square" id="1-attempt"></div>
+            <div class="square" id="2-attempt"></div>
+            <div class="square" id="3-attempt"></div>
+            <div class="square" id="4-attempt"></div>
+            <div class="square" id="5-attempt"></div>
+            <div class="square" id="6-attempt"></div>
+          </div>
+          <div id="informationHolder">
+            <div id="leftInformationPart">
+              <div class="reveal-hint">
+                <span>Hint : Cover reveal</span>
+                <h5>Available in <span id="attemptsLeft"></span> attempts</h5>
+                <button id="revealHintLeftButton" onclick="revealHint('cover')" disabled>Reveal</button>
+                <div class="background-hint"></div>
+              </div>
+              <div class="hint">
+                <img src="" alt="Album Cover" id="albumHintCover" class="cover-image">
+              </div>
+              <div class="album-info">
+                <p class="album-title">???</p>
+                <p class="album-artist" id="artistName">???</p>
+              </div>
+            </div>
+            <div class="iconWrapper" id="middleInformationPart">
+              <div class="iconLabelDisplay" id="fullDisplayRank">
+                <div class="tooltip tooltip-top">
+                <img class="icon" src="assets/rank.svg">
+                <span class="tooltip-text">Rank of the album in Rolling Stone's 500 Greatest Albums of All Time.</span>
+                </div>
+                <p  class="labelDisplay" id="rankInfo">?</p>
+                </div>
+              <div class="iconLabelDisplay" id="fullDisplayReleaseDate">
+                <div class="tooltip tooltip-top">
+                <img class="icon" src="assets/calendar.svg">
+                <span class="tooltip-text">Release date of the album.</span>
+                </div>
+                <p class="labelDisplay" id="releaseDateInfo">?</p>
+              </div>
+              <div class="iconLabelDisplay" id="fullDisplayGenre">
+                <div class="tooltip tooltip-top">
+                  <img class="icon" src="assets/genre.svg">
+                  <span class="tooltip-text">Genres of the album.</span>
+                </div>
+                <p class="labelDisplay" id="genreInfo">?</p>
+              </div>
+
+               <div class="iconLabelDisplay" id="fullDisplayAlbumType">
+                 <div class="tooltip tooltip-top">
+                   <img class="icon" src="assets/album-type.svg">
+                   <span class="tooltip-text">Type of the album ie Studio, Compile, Live, etc...</span>
+                   </div>
+                <p class="labelDisplay" id="albumTypeInfo">?</p>
+              </div>
+
+              <div class="iconLabelDisplay" id="fullDisplayGroupMembers">
+                 <div class="tooltip tooltip-bottom">
+                   <img class="icon" src="assets/users.svg">
+                   <span class="tooltip-text">Group members of the album.</span>
+                   </div>
+                <p class="labelDisplay" id="groupMembersInfo">?</p>
+              </div>
+              <div class="iconLabelDisplay" id="fullDisplayLocation">
+                
+                <div class="tooltip tooltip-bottom">
+                  <img class="icon" src="assets/location.svg">
+                   <span class="tooltip-text">Location of the album.</span>
+                   </div>
+                <p class="labelDisplay" id="locationInfo">?</p>
+              </div>
+
+                <div class="iconLabelDisplay" id="fullDisplayLabel">
+                <div class="tooltip tooltip-bottom">
+                  <img class="icon" src="assets/label.svg">
+                  <span class="tooltip-text">Label that produces the album.</span>
+                  </div>
+                  <p class="labelDisplay" id="labelInfo">?</p>
+              </div>
+            </div>
+            <div id="rightInformationPart">
+              <div class="reveal-hint">
+                <span>Hint : Popular tracks of the record</span>
+                <h5>Available in <span id="attemptsRight"></span> attempts</h5>
+                <button id="revealHintRightButton" onclick="revealHint('tracks')" disabled>Reveal</button>
+              </div>
+              <div class="hint" >
+                <ul id="knownTracksList"></ul>
+            </div>
+          </div>
+        </div>
+          <div class="autocomplete-container">
+            <input type="text" list="albumList" id="albumInput" placeholder="Enter album name">
+            <div id="autocompleteList" class="autocomplete-list" style="display:none"></div>
+          </div>
+          <button id="guessButton">Guess</button>
+          <hr class="rounded">
+
+          <div class="attemptsContainer" id="attemptsContainer">
+            <ul id="attemptsList"></ul>
+          </div>
+        </div>
+      </div>
+
+        <div class="bodyclass" id="revealSection">
+          <h2>Album of the day</h2>
+          <h3 id="revealMessage"></h3>
+          <div id="revealAlbumContainer"></div>
+          <a id="revealSpotify">Listen on Spotify</a>
+         <br><br>
+          <button onclick="location.reload()">Play Again</button>
+        </div>
+
+  <!-- Album Attempt Template (Hidden) -->
+  <template id="albumAttemptTemplate">
+    <li class="album-attempt">
+      <div class="left-part">
+      <div class="album-cover">
+        <img src="" alt="Album Cover" class="cover-image">
+      </div>
+      <div class="album-info">
+        <p class="album-title"></p>
+        <p class="album-artist"></p>
+      </div>
+      </div>
+      <div class="iconWrapper"> <!-- Icons for album information -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/rank.svg" title="Rank">
+          <div class="rankIcon"></div>
+        </div><!-- Rank -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/calendar.svg" title="Release Date">
+          <div class="releaseDateIcon"></div>
+        </div> <!-- Release date -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/genre.svg" title="Genre">
+          <div class="genreIcon"></div>
+        </div> <!-- Genre -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/album-type.svg" title="Album Type">
+          <div class="albumTypeIcon"></div>
+        </div> <!-- Album Type -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/users.svg" title="Group Members">
+          <div class="groupMemberIcon"></div>
+        </div> <!-- Group member -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/location.svg" title="Location">
+          <div class="locationIcon"></div>
+        </div> <!-- Location -->
+        <div class="iconLabel">
+          <img class="icon" src="assets/label.svg" title="Label">
+          <div class="labelIcon"></div>
+        </div> <!-- Label -->
+
+      </div>
+
+    </li>
+  </template>
+
+ <!-- Carousel Image Template (Hidden) -->
+  <template id="carouselImageTemplate">
+    <div class="tooltip ">
+    <img src="" alt="Album Cover" class="carousel-image">
+    <span class="tooltip-text"></span>
+  </div>
+  </template>
+
+
+  <!-- Album Attempt Template (Hidden) -->
+  <template id="suggestionTemplate">
+    <span class="suggestion-title"></span> -
+    <span class="suggestion-artist"></span>
+
+  </template>
+
+
+  <footer>
+    <p>For more information, visit the <a
+        href="https://www.rollingstone.com/music/music-news/rolling-stones-500-greatest-albums-of-all-time-1234621234/">Rolling
+        Stone's 500 Greatest Albums of All Time</a>.</p>
+		<p>Made with ❤️ by <a href="https://github.com/EstebanFernandes" target="_blank">Esteban Fernandes</a></p>
+	</footer>
+	<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+	<script src="layout.js"></script>
+</body>
+
+</html>

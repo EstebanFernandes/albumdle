@@ -1,0 +1,631 @@
+body {
+	font-family: Arial, sans-serif;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 100vh;
+	background-color: #e6e6e6;
+	z-index: -2;
+	position: sticky;
+	 margin: 0;
+  	padding: 0; /* optional, but often useful */
+}
+
+button:disabled {
+	background-color: #ccc;
+	color: #666;
+	cursor: not-allowed;
+}
+
+/*#region CAROUSEL CSS*/
+/* CAROUSEL CSS */
+.carousel-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  box-sizing: border-box;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.carousel {
+  position: relative;	
+}
+
+.carousel-track {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: max-content;
+  animation: scroll-up linear infinite;
+}
+
+.carousel.reverse .carousel-track {
+  animation: scroll-down linear infinite;
+}
+
+.carousel img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.carousel-image {
+    filter: blur(5px);
+}
+
+
+
+/* Smooth loop animations */
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scroll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.left{
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+}
+
+.right{
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+}
+
+
+/*#endregion */
+
+
+/*#region header CSS */
+header {	
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 8vh;
+	background-color: #f0f0f0;
+	border-bottom: 1px solid #ccc;
+	position: relative;
+	z-index: 2;
+}
+#headerLogo{
+	width: 50px;
+	height: 50px;
+	margin-right: 20px;
+}
+
+#questionMark {
+	width: 30px;
+	height: 30px;
+	margin-left: 20px;
+	cursor: pointer;
+}
+
+/* #endregion header CSS */
+
+
+/*#region background CSS */
+#backFilter {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(207, 207, 207, 0.5);
+	z-index: -1;
+	filter: blur(10px);
+}
+/*#endregion background CSS */
+
+.bodyclass {
+	width: 50vw;
+	height: 80vh;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 1;
+	/*overflow-y: scroll;*/
+}
+
+.square {
+	height: 30px;
+	width: 30px;
+	background-color: #555;
+	border-radius: 8px;
+}
+
+.squareHolder {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	flex-direction: row;
+}
+
+/* Rounded border */
+hr.rounded {
+	border-top: 4px solid #707070;
+	border-radius: 5px;
+}
+
+
+button {
+	border: none;
+	border-radius: 10px;
+	background-color: #ffffff;
+	color: #000000;
+	border-color: #ffffff;
+	padding: 10px 20px;
+	cursor: pointer;
+	font-weight: 700;
+	font-size: large;
+}
+
+#albumInput {
+	font-size: large; 
+	border-radius: 10px;
+	border: none;
+	padding: 0.5em;
+	background-color: white;
+	color: #000000;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.icon {
+	width: 30px;
+	height: 30px;
+}
+
+
+.iconLabel .icon{
+	width: 30%;
+	margin-right: 10px;
+}
+
+.iconLabel .labelDisplay{
+	width: 70%;
+	font-weight: bold;
+}
+
+
+.iconWrapper {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	row-gap: 5%;
+	column-gap: 1%;
+	width: 50%;
+	height: 50%;
+	justify-items: center;
+}
+
+.album-attempt {
+	display: flex;
+	flex-direction: row;
+	gap: 15px;
+	min-width: 80%;
+	height: 15vh;
+}
+
+.album-info {
+	display: flex;
+	flex-direction: column;
+	max-width: 50%;
+}
+
+.album-title {
+  color: #000000;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0;
+  max-height: 50%; /* Optional - depends on your layout */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* Adjust to how many lines you want */
+  line-clamp: 2; /* Optional future support */
+}
+
+
+.labelDisplay{
+	font-weight: bold;
+}
+
+#attemptsList {
+	list-style-type: none;
+	padding: 0;
+}
+
+#attemptsList li {
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #ccc;
+	
+}
+
+#attemptsList li:last-child {
+	border-bottom: none;
+}
+
+.attemptsContainer {
+	overflow-y: auto;
+	width: 100%;
+	height: 50%;
+}
+
+.attemptsContainer::-webkit-scrollbar {
+	width: 8px;
+
+}
+
+.attemptsContainer::-webkit-scrollbar-track {
+	background:transparent;
+}
+
+.album-artist {
+	color: #363636;
+	font-style: oblique;
+	font-weight: bold;
+}
+
+
+.reveal-hint {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	margin-bottom: 20px;
+	color:white;
+	font-weight: bold;
+	z-index: 5;
+}
+
+.reveal-hint button{
+	border: none;
+	border-radius: 10px;
+	background-color: #ffffff;
+	color: #000000;
+	border-color: #ffffff;
+	padding: 5px 10px;
+	cursor: pointer;
+	font-weight: 700;
+	font-size: medium;
+}
+
+
+.background-hint{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	filter : blur(10px);
+	border-radius: 10px;
+	padding: 6px;
+	z-index: -1;
+}
+
+.hint{
+	display: none;
+	width:100%;
+	height: 100%;	
+	
+}
+
+
+#informationHolder {
+	margin: 5px;
+	display: flex;
+	flex-direction: row;
+	gap:1% 0;
+	justify-content: space-evenly;
+	width: 100%;
+	margin-top: 5%;
+}
+
+
+#leftInformationPart{
+	display: flex;
+	flex-direction: row;
+	gap: 4%;
+	justify-content: space-evenly;
+	width: 35%;	
+}
+
+#leftInformationPart .reveal-hint {
+	width: 50%;
+	aspect-ratio: 1/1;
+	object-fit: cover;
+}
+
+#leftInformationPart .hint {
+	width: 50%;
+}
+
+#middleInformationPart{
+	width: 35%;
+	height: 100%;
+}
+
+#rightInformationPart{
+	width: 28%;
+}
+
+
+#knownTracksList{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	font-style: italic;
+	font-weight: bold ;
+}
+
+#albumHintCover{
+	filter: grayscale(80%);
+	filter: blur(10px);
+	transform: rotate(90deg);
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+}
+
+.iconLabel {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+	border-radius: 6px;
+	padding: 2px;
+}
+
+.iconLabelDisplay {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-radius: 8px;
+}
+
+.left-part{
+	min-width: 40%;
+	max-width:50%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	gap: 4%;
+	justify-content: space-evenly;
+}
+
+.cover-image {
+  width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+}
+
+
+
+
+
+.correct {
+	background-color: #32b637;
+	/* Green */
+}
+
+.close {
+	background-color: #ffcc22;
+	/* Yellow */
+}
+
+.incorrect {
+	background-color: #fd5a4ed8;
+	/* Red */
+}
+
+/* Make sure the parent of #autocompleteList is position: relative */
+.autocomplete-container {
+	position: relative;
+	width: 300px; /* or whatever your input width is */
+	display: flex;
+	flex-direction: column;
+	align-items: center; 
+	justify-content: center;
+}
+
+.autocomplete-list {
+	position: absolute;
+	top: calc(100% + 4px); /* sit just below the input */
+	left: 0;
+	right: 0;
+	max-height: 200px; /* don’t grow past 200px */
+	overflow-y: auto; /* scroll if too tall */
+	background: white;
+	border: 1px solid #ccc;
+	border-top: none;
+	z-index: 1000;
+	border-radius: 10px;
+}
+
+
+/* Style each suggestion */
+.suggestion-item {
+	padding: 8px 12px;
+	cursor: pointer;
+	white-space: nowrap; /* prevent wrapping if you don’t want it */
+}
+
+/* Hover state */
+.suggestion-item:hover {
+	background-color: #f0f0f0;
+}
+
+
+.suggestion-title {
+	font-weight: bold;
+	color: #000000;
+}
+
+.suggestion-artist {
+	color: #555555;
+}
+
+
+
+.autocomplete-item:hover {
+	background-color: #eee;
+}
+
+
+.locationIcon{
+	font-weight:normal
+}
+
+
+.tooltip-container:hover .tooltip-text {
+	visibility: visible;
+	opacity: 1;
+}
+
+footer {
+	z-index: -2;
+}
+
+/* FLIP CSS */
+
+.flip-card {
+	width: 50vw;
+	height: 80vh;
+	perspective: 1000px;
+}
+
+.flip-card-inner {
+width: 50vw;
+	height: 80vh;
+	transition: transform 0.8s;
+	transform-style: preserve-3d;
+	transform-origin: center;
+	/* Center the rotation */
+}
+
+.flip-card.flipped .flip-card-inner {
+	transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+	position:absolute;
+	backface-visibility: hidden;
+}
+
+.flip-card-back {
+	transform: rotateY(180deg);
+}
+
+
+/* #region Responsive Design */
+
+@media only screen and (max-width: 600px) {
+	.bodyclass {
+		width: 80vw;
+		height: 80vh;
+		padding: 10px;
+	}
+}
+
+/*#endregion Responsive Design */
+#revealSection{
+display: none;
+}
+
+
+/*#region Tooltip CSS */
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+}
+
+.tooltip .tooltip-text {
+	visibility: hidden;
+	width: 15em;
+	background-color: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	padding: 5px 10px;
+	border-radius: 6px;
+	position: absolute;
+	white-space: normal;
+	opacity: 0;
+	transition: opacity 0.3s;
+	z-index: 1000;
+	text-align: center;
+	/* Add these for consistent sizing */
+	box-sizing: border-box;
+	word-wrap: break-word;
+	line-height: 1.4;
+}
+
+.tooltip:hover .tooltip-text {
+	visibility: visible;
+	opacity: 1;
+	z-index : 1000;
+}
+
+/* Position variants */
+.tooltip-top .tooltip-text {
+	bottom: 125%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.tooltip-bottom .tooltip-text {
+	top: 125%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.tooltip-left .tooltip-text {
+	top: 50%;
+	right: 125%;
+	transform: translateY(-50%);
+}
+
+.tooltip-right .tooltip-text {
+	top: 50%;
+	left: 125%;
+	transform: translateY(-50%);
+}
+
+
+/*#endregion Tooltip CSS */
+
