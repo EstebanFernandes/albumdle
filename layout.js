@@ -3,11 +3,12 @@
 let albumData = [];
 let attempts = [];
 let currentTranslations = {};
-let attemptNumber = 1;
 const maxAttempts = 6;
 const attemptsBeforeCover = 3;
 const attemptsBeforeTracks = 2;
-let autocompleteInputValues = [];
+//Autocomplete variables
+let autoCompleteIndex = -1;
+
 const regionNames = new Intl.DisplayNames(
   ['en'], { type: 'region' }
 );
@@ -23,13 +24,6 @@ let groupMembersInfo = document.getElementById('groupMembersInfo');
 let locationInfo = document.getElementById('locationInfo');
 let labelInfo = document.getElementById('labelInfo');
 //FULL DISPLAY
-let fullDisplayRank = document.getElementById('fullDisplayRank');
-let fullDisplayReleaseDate = document.getElementById('fullDisplayReleaseDate');
-let fullDisplayGenre = document.getElementById('fullDisplayGenre');
-let fullDisplayAlbumType = document.getElementById('fullDisplayAlbumType');
-let fullDisplayGroupMembers = document.getElementById('fullDisplayGroupMembers');
-let fullDisplayLocation = document.getElementById('fullDisplayLocation');
-let fullDisplayLabel = document.getElementById('fullDisplayLabel');
 let artistName = document.getElementById('artistName');
 
 //Game section needed
@@ -41,7 +35,6 @@ let attemptsRightBeforeReveal = document.getElementById('attemptsRight');
 let albumHintCover = document.getElementById('albumHintCover');
 
 let knownTracksList = document.getElementById('knownTracksList');
-let revealTracksButton = document.getElementById('revealHintButton');
 
 
 async function loadAlbumCSV() {
@@ -49,7 +42,6 @@ async function loadAlbumCSV() {
     const response = await fetch('albums.csv');
     const text = await response.text();
     albumData = parseCSV(text);
-    console.log("CSV loaded:", albumData.length, "albums");
     //populateDatalist(albumData);
   } catch (err) {
     console.error("Failed to load CSV:", err);
@@ -142,7 +134,7 @@ function createAlbumAttempt(data, todayAlbum) {
       (`${capitalize(t("group"))} (${data.artist_member_count})` || 'Unknown Group Members');
   clone.querySelector('.groupMemberIcon').textContent = memberCount;
   if (data.country.length === 2)
-    clone.querySelector('.locationIcon').textContent = (data.country != '') ? getFlagEmoji(data.country) : 'Unknown Location';
+    clone.querySelector('.locationIcon').textContent = (data.country !== '') ? getFlagEmoji(data.country) : 'Unknown Location';
   else
     clone.querySelector('.locationIcon').textContent = data.country
   return clone;
@@ -153,7 +145,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   initLanguage();
   await loadAlbumCSV();
   const todayAlbum = getAlbumOfTheDay();
-  console.log("Album of the Day:", todayAlbum);
+  //console.log("Album of the Day:", todayAlbum);
   knownTracksList.innerHTML = ''; // Clear previous tracks
   if (todayAlbum) {
     // Populate the album cover hint
@@ -175,6 +167,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 input.addEventListener('input', () => {
   const query = input.value.trim().toLowerCase();
   suggestionBox.innerHTML = '';
+  autoCompleteIndex = -1;
 
   if (!query) {
     suggestionBox.style.display = 'none';
@@ -220,6 +213,41 @@ document.addEventListener('click', e => {
     suggestionBox.style.display = 'none';
   }
 });
+document.addEventListener('keydown', e => {
+  const items = suggestionBox.querySelectorAll('.suggestion-item');
+  if (items.length === 0 || suggestionBox.style.display === 'none') return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    autoCompleteIndex = (autoCompleteIndex + 1) % items.length;
+    updateHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    autoCompleteIndex = (autoCompleteIndex - 1 + items.length) % items.length;
+    updateHighlight(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (autoCompleteIndex >= 0 && autoCompleteIndex < items.length) {
+      const selected = items[autoCompleteIndex];
+      input.value = selected.dataset.album; // or combine artist if you want
+      suggestionBox.style.display = 'none';
+    }
+  }
+});
+
+function updateHighlight(items) {
+  items.forEach((item, index) => {
+    item.classList.toggle('hover', index === autoCompleteIndex);
+  });
+
+  const activeItem = items[autoCompleteIndex];
+  if (activeItem) {
+    activeItem.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth'
+    });
+  }
+}
 
 
 // Event listener for the guess button
@@ -245,7 +273,6 @@ function evaluateAttempt(attempt) {
   document.getElementById('attemptsList').prepend(createAlbumAttempt(attempt, todayAlbum));
   document.getElementById('attemptsContainer').scrollTo({ top: 0, behavior: 'smooth' });
   attempts.push(attempt);
-  attemptNumber++;
   updateHints();
 
   if (todayAlbum === attempt) {
@@ -346,23 +373,17 @@ function createArrow(iconName,direction = true) {
   return iconElement;
 }
 
-function createIconElement(iconName) {
-  const iconElement = document.createElement("div");
-  iconElement.className = "fonticon";
-  iconElement.style.backgroundImage = `url('assets/${iconName}.png')`;
-  return iconElement;
-}
 
 function updateHints() {
   const attemptsLeft = maxAttempts - attemptsBeforeCover - attempts.length;
   attemptsLeftBeforeReveal.textContent = attemptsLeft;
-  if (attemptsLeft == 0) {
+  if (attemptsLeft === 0) {
     document.getElementById("revealHintLeftButton").disabled = false;
     document.getElementById("attemptsLeftBeforeReveal").innerHTML = t("hint-available");
   }
   const attemptsRight = maxAttempts - attemptsBeforeTracks - attempts.length;
   attemptsRightBeforeReveal.textContent = attemptsRight;
-  if (attemptsRight == 0) {
+  if (attemptsRight === 0) {
     document.getElementById("revealHintRightButton").disabled = false;
     document.getElementById("attemptsRightBeforeReveal").innerHTML = t("hint-available");
   }
