@@ -42,6 +42,14 @@ button:disabled {
   position: relative;	
 }
 
+.fonticon{
+	margin-left: 2px;
+	  width: 1em;
+	  height: 1em;
+  color: #000000;
+}
+
+
 .carousel-track {
   display: flex;
   flex-direction: column;
@@ -261,6 +269,7 @@ button {
 
 .labelDisplay{
 	font-weight: bold;
+	display: flex;
 }
 
 #attemptsList {

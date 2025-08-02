@@ -273,13 +273,19 @@ function updateAlbumInformation(todayAlbum, attempt) {
 
   // RANK LOGIC
   const ranks = attempts.map(a => Number(a.rank_2020)).filter(n => !isNaN(n));
-  let rankText = numericLogic(ranks, todayAlbum.rank_2020, fullDisplayRank.id, true);
+  let rankResult = numericLogic(ranks, todayAlbum.rank_2020,true);
+  let rankText = rankResult.closest;
   rankInfo.textContent = rankText;
-
+  if ('direction' in rankResult) {
+    rankInfo.appendChild(createArrow('arrow', rankResult.direction));
+  }
   // RELEASE YEAR LOGIC
   const releases = attempts.map(a => Number(a.release_year)).filter(n => !isNaN(n));
-  let releaseText = numericLogic(releases, todayAlbum.release_year, fullDisplayReleaseDate.id);
-  releaseDateInfo.textContent = releaseText;
+  let releaseResult = numericLogic(releases, todayAlbum.release_year);
+  releaseDateInfo.textContent = releaseResult.closest;
+  if ('direction' in releaseResult) {
+    releaseDateInfo.appendChild(createArrow('arrow', releaseResult.direction));
+  }
 
   const genres = Array.from(new Set(
     attempts
@@ -332,6 +338,20 @@ function revealEverything() {
   document.getElementById('albumTitle').innerHTML = title;
 }
 
+function createArrow(iconName,direction = true) {
+  const iconElement = document.createElement("img");
+  iconElement.className = "fonticon";
+  iconElement.src = `assets/${iconName}.svg`;
+  iconElement.style.transform = direction ? 'rotate(0deg)' : 'rotate(180deg)';
+  return iconElement;
+}
+
+function createIconElement(iconName) {
+  const iconElement = document.createElement("div");
+  iconElement.className = "fonticon";
+  iconElement.style.backgroundImage = `url('assets/${iconName}.png')`;
+  return iconElement;
+}
 
 function updateHints() {
   const attemptsLeft = maxAttempts - attemptsBeforeCover - attempts.length;
@@ -384,11 +404,14 @@ function numericLogic(values, aimValue, isReverse = false) {
 
 
   if (values.length === 1) {
-    if (!isReverse)
-      return (values[0] > aimValue) ? `${values[0]} ↓` : `${values[0]} ↑`;
-    else
-      return (values[0] < aimValue) ? `${values[0]} ↓` : `${values[0]} ↑`;
+    if (isReverse) {
+      const direction = values[0] < aimValue ? false : true;
+      return {"closest" : values[0],  "direction" : direction}
+    } else {
+      const direction = values[0] > aimValue ? false : true;
+      return {"closest" : values[0],  "direction" : direction}
   }
+}
 
   let minRange = null;
 
@@ -410,7 +433,7 @@ function numericLogic(values, aimValue, isReverse = false) {
   }
 
   if (minRange) {
-    return `${minRange.low} - ${minRange.high}`;
+    return {"closest" : `${minRange.low} - ${minRange.high}`};
   }
 
   // If no valid range found, return nearest value + arrow
@@ -425,11 +448,11 @@ function numericLogic(values, aimValue, isReverse = false) {
     }
   }
 
-
-  let direction = closest < aimValue ? '↑' : '↓';
+//True = up, False = down
+  let direction = closest < aimValue ? true : false;
   if (isReverse)
-    direction = closest > aimValue ? '↑' : '↓';
-  return `${closest} ${direction}`;
+    direction = closest > aimValue ? true : false;
+  return {"closest" : closest,  "direction" : direction}
 }
 
 function genreLogic(genres, aimGenres) {
