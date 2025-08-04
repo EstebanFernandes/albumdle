@@ -162,6 +162,7 @@ header {
 	align-items: center;
 	justify-content: center;
 	z-index: 1;
+	
 	/*overflow-y: scroll;*/
 }
 
@@ -578,11 +579,19 @@ footer {
 
 @media only screen and (max-width: 600px) {
 	.bodyclass {
-		width: 80vw;
+		width: 100vw;
 		height: 80vh;
 		padding: 10px;
 	}
 }
+
+
+@media only screen and (max-width: 600px) {
+	.carousel-wrapper{
+		display: none;
+	}
+}
+
 
 /*#endregion Responsive Design */
 #revealSection{

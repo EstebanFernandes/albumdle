@@ -150,8 +150,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (todayAlbum) {
     // Populate the album cover hint
     albumHintCover.src = todayAlbum.large_thumbnails || 'fallback.jpg';
-    albumHintCover.alt = todayAlbum.album || 'Unknown Album Cover';
-    albumHintCover.title = todayAlbum.album || 'Unknown Album Cover';
     // Populate the attempts left before reveal
     knownTracksList.innerHTML = todayAlbum.top_songs
       ? todayAlbum.top_songs.split(';').map(track => `<li>${track.trim()}</li>`).join('')
@@ -420,7 +418,7 @@ function numericLogic(values, aimValue, isReverse = false) {
   }
   if (values.includes(aimValue)) {
 
-    return String(aimValue);
+     return {"closest" :String(aimValue)}
   }
 
 
@@ -607,7 +605,6 @@ async function revealAnswer(album, hasWin = true) {
   } else {
     document.getElementById('revealMessage').textContent = t("reveal.lose");
   }
-  updateAlbumInformation(album, album);
   document.getElementById('guessContainer').style.display = "none";
   document.getElementById('revealAnswer').style.display = "flex";
 
@@ -638,23 +635,30 @@ async function populateCarousels(data) {
     console.error("One or more carousel containers not found.");
     return;
   }
+  let maxVH = 20
+  while(window.innerWidth < 0.04*maxVH * window.innerHeight)
+  {
+    maxVH-=5
+  }
+  const minVH = maxVH-5
+
 
   // Shuffle and get 40 items
   const shuffled = [...data].sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 40);
 
   // Async loading of tracks (can be awaited if needed)
-  loadCarouselTrack(leftTrack, selected, 0, 10);
+  loadCarouselTrack(leftTrack, selected, 0, 10,minVH);
   applyRandomScrollSpeed(leftTrack, false);
-  loadCarouselTrack(leftTrackReverse, selected, 10, 20);
+  loadCarouselTrack(leftTrackReverse, selected, 10, 20,minVH);
   applyRandomScrollSpeed(leftTrackReverse, true);
-  loadCarouselTrack(rightTrack, selected, 20, 30);
+  loadCarouselTrack(rightTrack, selected, 20, 30,minVH);
   applyRandomScrollSpeed(rightTrack, false);
-  loadCarouselTrack(rightTrackReverse, selected, 30, 40);
+  loadCarouselTrack(rightTrackReverse, selected, 30, 40,minVH);
   applyRandomScrollSpeed(rightTrackReverse, true);
 }
 
-async function loadCarouselTrack(track, data, start, end) {
+async function loadCarouselTrack(track, data, start, end, maxVH) {
   if (!track) return;
 
   track.innerHTML = '';
@@ -664,7 +668,7 @@ async function loadCarouselTrack(track, data, start, end) {
   // Create once
   for (let i = start; i < end; i++) {
     const item = data[i];
-    const el = createImageElement(item);
+    const el = createImageElement(item,maxVH);
     elements.push(el);
     track.appendChild(el);
   }
@@ -678,7 +682,7 @@ async function loadCarouselTrack(track, data, start, end) {
 
 
 
-function createImageElement(item) {
+function createImageElement(item,maxVH) {
   const { small_thumbnails,  album, clean_name, release_year } = item;
 
   const template = document.getElementById('carouselImageTemplate');
@@ -689,8 +693,8 @@ function createImageElement(item) {
   //img.title = album || "Album cover";
   img.style.objectFit = "cover";
   img.style.borderRadius = "10px";
-  // 🔥 Random square size using vh (e.g., 15vh to 20vh)
-  let size = 15 + Math.random() * 5; // Between 15vh–20vh
+  // 🔥 Random square size using vh (e.g., max VH and +5 )
+  let size = maxVH + Math.random() * 5; // Between 15vh–20vh
   img.style.width = `${size}vh`;
   img.style.height = `${size}vh`;
 
