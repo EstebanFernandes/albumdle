@@ -1,9 +1,10 @@
 
 // Global variable to store the parsed CSV data
+let isFirstTime = true
 let albumData = [];
 let attempts = [];
 let currentTranslations = {};
-const maxAttempts = 6;
+const maxAttempts = 7;
 const attemptsBeforeCover = 3;
 const attemptsBeforeTracks = 2;
 //Autocomplete variables
@@ -258,14 +259,22 @@ document.getElementById('guessButton').addEventListener('click', () => {
   );
 
   if (match) {
-    evaluateAttempt(match);
+      if(isFirstTime)
+    {
+      document.getElementById("subtitle").innerText = t('subtitle')
+      isFirstTime=false;
+      evaluateFirstAttempt(match)
+    }
+    else
+      evaluateAttempt(match);
   } else {
     console.log("No match found for:", inputValue);
   }
   document.getElementById('albumInput').value = ''; // Clear input after guess
 });
 
-function evaluateAttempt(attempt) {
+
+function evaluateFirstAttempt(attempt) {
   const todayAlbum = getAlbumOfTheDay();
   // Get today's album
   document.getElementById('attemptsList').prepend(createAlbumAttempt(attempt, todayAlbum));
@@ -278,13 +287,31 @@ function evaluateAttempt(attempt) {
     revealAnswer(todayAlbum);
     return;
   }
+  updateAlbumInformation(todayAlbum, attempt);
+
+
+}
+
+function evaluateAttempt(attempt) {
+  const todayAlbum = getAlbumOfTheDay();
+  // Get today's album
+  document.getElementById('attemptsList').prepend(createAlbumAttempt(attempt, todayAlbum));
+  document.getElementById('attemptsContainer').scrollTo({ top: 0, behavior: 'smooth' });
+  attempts.push(attempt);
+  updateHints();
+
+  if (todayAlbum === attempt) {
+    document.getElementById(String(attempts.length-1) + '-attempt').classList.add('correct');
+    revealAnswer(todayAlbum);
+    return;
+  }
   if (attempts.length === maxAttempts) {
     revealAnswer(todayAlbum, false);
     return;
   }
 
   // If not correct, add 'incorrect' class to the attempt and update stats
-  document.getElementById(String(attempts.length) + '-attempt').classList.add('incorrect');
+  document.getElementById(String(attempts.length-1) + '-attempt').classList.add('incorrect');
   updateAlbumInformation(todayAlbum, attempt);
 
 
@@ -373,13 +400,13 @@ function createArrow(iconName,direction = true) {
 
 
 function updateHints() {
-  const attemptsLeft = maxAttempts - attemptsBeforeCover - attempts.length;
+  const attemptsLeft = maxAttempts - attemptsBeforeCover - attempts.length-1;
   attemptsLeftBeforeReveal.textContent = attemptsLeft;
   if (attemptsLeft === 0) {
     document.getElementById("revealHintLeftButton").disabled = false;
     document.getElementById("attemptsLeftBeforeReveal").innerHTML = t("hint-available");
   }
-  const attemptsRight = maxAttempts - attemptsBeforeTracks - attempts.length;
+  const attemptsRight = maxAttempts - attemptsBeforeTracks - attempts.length-1;
   attemptsRightBeforeReveal.textContent = attemptsRight;
   if (attemptsRight === 0) {
     document.getElementById("revealHintRightButton").disabled = false;
@@ -600,7 +627,7 @@ function getInterpolatedColor(ratio) {
 async function revealAnswer(album, hasWin = true) {
   if (hasWin) {
     document.getElementById('revealMessage').textContent = t("reveal.win");
-    document.getElementById("subtitle").textContent = `${t("reveal.subtitle")} ${attempts.length} / ${maxAttempts} ${t("attempts")}!`;
+    document.getElementById("subtitle").textContent = `${t("reveal.subtitle")} ${attempts.length-1} / ${maxAttempts} ${t("attempts")}!`;
     launchTopConfettiBurst()
   } else {
     document.getElementById('revealMessage').textContent = t("reveal.lose");
